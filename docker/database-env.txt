@@ -1,0 +1,2 @@
+POSTGRES_DB=cart-service-db-dev
+POSTGRES_USER=admin
