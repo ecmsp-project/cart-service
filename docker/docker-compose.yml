@@ -20,7 +20,7 @@ services:
             - cart-service-db-password
         environment:
             - POSTGRES_USER=admin
-            - POSTGRES_DB=cart-service-db-dev
+            - POSTGRES_DB=cart-service-db
             - POSTGRES_PASSWORD_FILE=/run/secrets/cart-service-db-password
         env_file:
             -

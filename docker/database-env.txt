@@ -1,2 +1,2 @@
-POSTGRES_DB=cart-service-db-dev
+POSTGRES_DB=cart-service-db
 POSTGRES_USER=admin
