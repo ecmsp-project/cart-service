@@ -8,7 +8,7 @@ services:
             dockerfile: Dockerfile
         container_name: product-service
         ports:
-            - "${PRODUCT_SERVICE_PORT:?err}:8080"
+            - "${PRODUCT_SERVICE_PORT:?error}:8080"
         env_file:
             -
                 path: ../product-service/docker/app-env.txt
@@ -28,7 +28,7 @@ services:
             start_period: 30s
             timeout: 10s
         ports:
-            - "${PRODUCT_SERVICE_DB_PORT:?err}:5432"
+            - "${PRODUCT_SERVICE_DB_PORT:?error}:5432"
         volumes:
             - ../product-service/docker/init.sql:/docker-entrypoint-initdb.d/init.sql
             - product-service-db:/var/lib/postgresql/data
@@ -50,7 +50,7 @@ services:
             dockerfile: Dockerfile
         container_name: order-service
         ports:
-            - "${ORDER_SERVICE_PORT:?err}:8080"
+            - "${ORDER_SERVICE_PORT:?error}:8080"
         env_file:
             -
                 path: ../order-service/docker/app-env.txt
@@ -70,7 +70,7 @@ services:
             start_period: 30s
             timeout: 10s
         ports:
-            - "${ORDER_SERVICE_DB_PORT:?err}:5432"
+            - "${ORDER_SERVICE_DB_PORT:?error}:5432"
         volumes:
             - ../order-service/docker/init.sql:/docker-entrypoint-initdb.d/init.sql
             - order-service-db:/var/lib/postgresql/data
@@ -92,7 +92,7 @@ services:
             dockerfile: Dockerfile
         container_name: payment-service
         ports:
-            - "${PAYMENT_SERVICE_PORT:?err}:8080"
+            - "${PAYMENT_SERVICE_PORT:?error}:8080"
         env_file:
             -
                 path: ../payment-service/docker/app-env.txt
@@ -112,7 +112,7 @@ services:
             start_period: 30s
             timeout: 10s
         ports:
-            - "${PAYMENT_SERVICE_DB_PORT:?err}:5432"
+            - "${PAYMENT_SERVICE_DB_PORT:?error}:5432"
         volumes:
             - ../payment-service/docker/init.sql:/docker-entrypoint-initdb.d/init.sql
             - payment-service-db:/var/lib/postgresql/data
