@@ -26,13 +26,13 @@ public class CartProductService {
     }
 
     public List<CartProductDto> getCartProductsByCartId(Integer cartId) {
-        Optional<Cart> cartOptional = cartRepository.findById(cartId);
-
-        if (cartOptional.isPresent()) {
-            return cartProductRepository.findByCart(cartOptional.get()).stream()
-                    .map(this::convertToDto)
-                    .collect(Collectors.toList());
-        }
+//        Optional<Cart> cartOptional = cartRepository.findById(cartId);
+//
+//        if (cartOptional.isPresent()) {
+//            return cartProductRepository.findByCart(cartOptional.get()).stream()
+//                    .map(this::convertToDto)
+//                    .collect(Collectors.toList());
+//        }
 
         return List.of();
     }
@@ -56,32 +56,32 @@ public class CartProductService {
     }
 
     public Optional<CartProductDto> updateCartProduct(Integer cartId, Integer productId, CartProductDto cartProductDTO) {
-        Optional<Cart> cartOptional = cartRepository.findById(cartId);
-        
-        if (cartOptional.isPresent()) {
-            Cart cart = cartOptional.get();
-            CartProductId id = new CartProductId(cart, productId);
-            
-            return cartProductRepository.findById(id)
-                    .map(existingCartProduct -> {
-                        existingCartProduct.setQuantity(cartProductDTO.getQuantity());
-                        return cartProductRepository.save(existingCartProduct);
-                    })
-                    .map(this::convertToDto);
-        }
+//        Optional<Cart> cartOptional = cartRepository.findById(cartId);
+//
+//        if (cartOptional.isPresent()) {
+//            Cart cart = cartOptional.get();
+//            CartProductId id = new CartProductId(cart, productId);
+//
+//            return cartProductRepository.findById(id)
+//                    .map(existingCartProduct -> {
+//                        existingCartProduct.setQuantity(cartProductDTO.getQuantity());
+//                        return cartProductRepository.save(existingCartProduct);
+//                    })
+//                    .map(this::convertToDto);
+//        }
         
         return Optional.empty();
     }
 
     public boolean deleteCartProduct(Integer cartId, Integer productId) {
-        Optional<Cart> cartOptional = cartRepository.findById(cartId);
-        
-        if (cartOptional.isPresent()) {
-            Cart cart = cartOptional.get();
-            CartProductId id = new CartProductId(cart, productId);
-            cartProductRepository.deleteById(id);
-            return true;
-        }
+//        Optional<Cart> cartOptional = cartRepository.findById(cartId);
+//
+//        if (cartOptional.isPresent()) {
+//            Cart cart = cartOptional.get();
+//            CartProductId id = new CartProductId(cart, productId);
+//            cartProductRepository.deleteById(id);
+//            return true;
+//        }
         
         return false;
     }

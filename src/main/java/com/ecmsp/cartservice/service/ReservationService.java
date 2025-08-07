@@ -44,6 +44,8 @@ public class ReservationService {
             return new ReservationSuccessResponse();
         }
 
+        // TODO: provide proper return statement
+        return null;
     }
     public ReservationProductMessage buildReservationProductMessage(Set<CartProductDto> productDtos){
         return new ReservationProductMessage();

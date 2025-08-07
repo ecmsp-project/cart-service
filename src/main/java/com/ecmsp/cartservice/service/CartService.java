@@ -76,7 +76,7 @@ public class CartService {
                     return p;
                 }).collect(Collectors.toSet()));
 
-        return convertToDTO(cartRepository.saveCart(convertToEntity(cart)));
+        return convertToDTO(cartRepository.save(convertToEntity(cart)));
     }
 
 
@@ -95,7 +95,7 @@ public class CartService {
             }
         });
 
-        return convertToDTO(cartRepository.saveCart(convertToEntity(cart)));
+        return convertToDTO(cartRepository.save(convertToEntity(cart)));
     }
 
     public void deleteCart(UserId id) {
