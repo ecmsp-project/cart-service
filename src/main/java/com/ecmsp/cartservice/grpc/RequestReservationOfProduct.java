@@ -10,6 +10,7 @@ import java.util.List;
 @Component
 public class RequestReservationOfProduct {
     public ReservationMessageResponse reserveProducts(ReservationProductMessage message){
-        return new ReservationMessageResponse(true);
+        // TODO: substitute variants of null to proper value
+        return new ReservationMessageResponse(true, null);
     }
 }

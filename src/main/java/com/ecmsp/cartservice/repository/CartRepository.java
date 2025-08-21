@@ -11,6 +11,9 @@ import java.util.Optional;
 @Repository
 public interface CartRepository extends JpaRepository<Cart, Long> {
     List<Cart> findByUserId(Long userId);
-    Cart saveCart(Cart cart);
+
+    // TODO: what is it for?
+//    Cart saveCart(Cart cart);
+
     void deleteCartByUserId(Long userId);
 }
