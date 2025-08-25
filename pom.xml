@@ -81,7 +81,7 @@
 			<groupId>org.springframework.kafka</groupId>
 			<artifactId>spring-kafka</artifactId>
 			<version>3.3.4</version>
-
+		</dependency>
 		<dependency>
 			<groupId>com.ecmsp</groupId>
 			<artifactId>protos</artifactId>
@@ -144,6 +144,11 @@
 	</build>
 
 	<repositories>
+		<repository>
+			<id>central</id>
+			<name>Maven Central</name>
+			<url>https://repo.maven.apache.org/maven2</url>
+		</repository>
 		<repository>
 			<id>nexus-ecmsp-releases</id>
 			<name>nexus-ecmsp-releases</name>
