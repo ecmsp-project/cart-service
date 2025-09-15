@@ -1,6 +1,6 @@
 package com.ecmsp.cartservice.dto;
 
-import java.util.List;
+import com.ecmsp.cartservice.dto.event.CartCreatedEvent;
 
-public record OrderCreateMessage(List<String> variants) {
+public record OrderCreateMessage(CartCreatedEvent cartCreatedEvent) {
 }

@@ -1,6 +1,13 @@
 package com.ecmsp.cartservice.dto;
 
+import java.util.List;
+
 public record ReservationProductMessage(
-        //product variant
+        List<ReservationProduct> products
 ) {
+    public record ReservationProduct(
+            Integer productId,
+            Integer quantity
+    ) {
+    }
 }
