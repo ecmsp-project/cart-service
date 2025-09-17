@@ -2,24 +2,60 @@ package com.ecmsp.cartservice.grpc;
 
 import com.ecmsp.cartservice.dto.ReservationMessageResponse;
 import com.ecmsp.cartservice.dto.ReservationProductMessage;
+import com.ecmsp.product.v1.ProductReservationServiceGrpc;
+import com.ecmsp.product.v1.ReserveProductsRequest;
+import com.ecmsp.product.v1.ReserveProductsResponse;
+import com.ecmsp.product.v1.ProductReservationItem;
+import io.grpc.StatusRuntimeException;
+import lombok.extern.slf4j.Slf4j;
+import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 public class RequestReservationOfProduct {
 
-    public ReservationMessageResponse reserveProducts(ReservationProductMessage message){
-        // TODO: Implement actual gRPC call to product-service
-        // For now, simulating a successful reservation
-        System.out.println("Attempting to reserve products: " + message.products());
+    @GrpcClient("product-service")
+    private ProductReservationServiceGrpc.ProductReservationServiceBlockingStub productReservationStub;
 
-        // Simulate successful reservation with mock variants
-        List<String> mockVariants = message.products().stream()
-                .map(product -> "variant-" + product.productId() + "-" + product.quantity())
-                .toList();
+    public ReservationMessageResponse reserveProducts(ReservationProductMessage message) {
+        try {
+            log.info("Attempting to reserve products via gRPC: {}", message.products());
 
-        return new ReservationMessageResponse(true, mockVariants);
+            // Build gRPC request from internal DTO
+            ReserveProductsRequest grpcRequest = ReserveProductsRequest.newBuilder()
+                    .addAllItems(message.products().stream()
+                            .map(product -> ProductReservationItem.newBuilder()
+                                    .setProductId(product.productId())
+                                    .setQuantity(product.quantity())
+                                    .build())
+                            .collect(Collectors.toList()))
+                    .build();
+
+            // Make gRPC call to product-service
+            ReserveProductsResponse grpcResponse = productReservationStub.reserveProducts(grpcRequest);
+
+            log.info("Received gRPC response: success={}, message={}, reserved_variants={}, failed_reservations={}",
+                    grpcResponse.getSuccess(),
+                    grpcResponse.getMessage(),
+                    grpcResponse.getReservedVariantIdsList(),
+                    grpcResponse.getFailedReservationsCount());
+
+            // Convert gRPC response to internal DTO
+            return new ReservationMessageResponse(
+                    grpcResponse.getSuccess(),
+                    grpcResponse.getReservedVariantIdsList()
+            );
+
+        } catch (StatusRuntimeException e) {
+            log.error("gRPC call failed with status: {}, description: {}", e.getStatus(), e.getStatus().getDescription());
+            return new ReservationMessageResponse(false, List.of());
+        } catch (Exception e) {
+            log.error("Unexpected error during product reservation", e);
+            return new ReservationMessageResponse(false, List.of());
+        }
     }
 }

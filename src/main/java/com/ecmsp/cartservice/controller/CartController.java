@@ -30,7 +30,7 @@ public class CartController {
 
 
     //TODO get cart by jwt token
-    @GetMapping
+    @GetMapping("/{id}")
     public ResponseEntity<CartDto> getCartByUser(@PathVariable("id") Long id) {
         Optional<CartDto> cartData = cartService.getCartById(new UserId(id));
         return cartData.map(ResponseEntity::ok)
