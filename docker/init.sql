@@ -23,3 +23,16 @@ INSERT INTO cart_product (cart_id, product_id, quantity) VALUES
                                                              (2, 1003, 5),
                                                              (3, 1001, 1),
                                                              (3, 1004, 3);
+CREATE TABLE KAFKA_OUTBOX (
+                              id UUID PRIMARY KEY,
+                              payload JSONB NOT NULL,
+                              created_at TIMESTAMP NOT NULL,
+                              processed BOOLEAN NOT NULL DEFAULT FALSE,
+                              processed_at TIMESTAMP,
+                              event_type VARCHAR(255) NOT NULL,
+                              topic VARCHAR(255)
+);
+
+CREATE INDEX idx_kafka_outbox_unprocessed ON KAFKA_OUTBOX (processed, created_at) WHERE processed = FALSE;
+CREATE INDEX idx_kafka_outbox_event_type ON KAFKA_OUTBOX (event_type);
+CREATE INDEX idx_kafka_outbox_created_at ON KAFKA_OUTBOX (created_at);

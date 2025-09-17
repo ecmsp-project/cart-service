@@ -104,6 +104,11 @@
             <artifactId>protos</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
+		<dependency>
+			<groupId>org.awaitility</groupId>
+			<artifactId>awaitility</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
