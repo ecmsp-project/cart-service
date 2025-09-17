@@ -47,10 +47,16 @@ public class ReservationService {
             OrderCreateMessage orderCreateMessage = new OrderCreateMessage(cartCreatedEvent);
             orderKafkaProducer.sendToCreateRawOrder(orderCreateMessage);
 
-            return new ReservationSuccessResponse();
+            // Delete cart after successful reservation and order creation
+            cartService.deleteCart(userId);
+
+            return new ReservationSuccessResponse(
+                "Products successfully reserved. Order has been created and cart cleared.",
+                reservationMessageResponse.variants()
+            );
         }
 
-        return new ReservationFailedResponse();
+        return new ReservationFailedResponse("Failed to reserve products. Please check product availability and try again.");
     }
     public ReservationProductMessage buildReservationProductMessage(Set<CartProductDto> productDtos){
         List<ReservationProductMessage.ReservationProduct> products = productDtos.stream()
