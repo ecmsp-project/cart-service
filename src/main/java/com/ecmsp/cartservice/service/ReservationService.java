@@ -5,6 +5,7 @@ import com.ecmsp.cartservice.domain.wrappers.UserId;
 import com.ecmsp.cartservice.dto.*;
 import com.ecmsp.cartservice.dto.OrderCreateMessage;
 import com.ecmsp.cartservice.dto.event.CartCreatedEvent;
+import com.ecmsp.cartservice.dto.event.ReservationEventPayload;
 import com.ecmsp.cartservice.dto.reservation.ReservationResponse;
 import com.ecmsp.cartservice.dto.reservation.ReservationSuccessResponse;
 import com.ecmsp.cartservice.dto.reservation.ReservationFailedResponse;
@@ -12,6 +13,7 @@ import com.ecmsp.cartservice.grpc.RequestReservationOfProduct;
 import com.ecmsp.cartservice.kafka.OrderKafkaProducer;
 import com.sun.jdi.request.InvalidRequestStateException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -26,13 +28,18 @@ public class ReservationService {
     private final CartService cartService;
     private final OrderKafkaProducer orderKafkaProducer;
     private final RequestReservationOfProduct requestReservationOfProduct;
+    private final KafkaOutboxService kafkaOutboxService;
 
-    public ReservationService(CartService cartService, OrderKafkaProducer orderKafkaProducer, RequestReservationOfProduct requestReservationOfProduct) {
+    public ReservationService(CartService cartService, OrderKafkaProducer orderKafkaProducer,
+                            RequestReservationOfProduct requestReservationOfProduct,
+                            KafkaOutboxService kafkaOutboxService) {
         this.cartService = cartService;
         this.orderKafkaProducer = orderKafkaProducer;
         this.requestReservationOfProduct = requestReservationOfProduct;
+        this.kafkaOutboxService = kafkaOutboxService;
     }
 
+    @Transactional
     public ReservationResponse createReservation(UserId userId){
         CartDto userCart = cartService.getCartOrCreateNew(userId);
         Set<CartProductDto> productDtos = userCart.getCartProducts();
@@ -43,9 +50,15 @@ public class ReservationService {
 
         ReservationMessageResponse reservationMessageResponse = requestReservationOfProduct.reserveProducts(reservationProductMessage);
         if(reservationMessageResponse.success()){
+            UUID reservationId = UUID.randomUUID();
+            UUID clientId = UUID.randomUUID();
+
             CartCreatedEvent cartCreatedEvent = buildCartCreatedEvent(userId, productDtos);
             OrderCreateMessage orderCreateMessage = new OrderCreateMessage(cartCreatedEvent);
             orderKafkaProducer.sendToCreateRawOrder(orderCreateMessage);
+
+            ReservationEventPayload eventPayload = buildReservationEventPayload(reservationId, clientId, productDtos);
+            kafkaOutboxService.saveEvent(eventPayload, "RESERVATION_SUCCESS", "reservation-events");
 
             return new ReservationSuccessResponse();
         }
@@ -78,5 +91,22 @@ public class ReservationService {
                 .collect(Collectors.toList());
 
         return new CartCreatedEvent(clientId, items);
+    }
+
+    private ReservationEventPayload buildReservationEventPayload(UUID reservationId, UUID clientId, Set<CartProductDto> productDtos) {
+        List<ReservationEventPayload.ProductReservation> products = productDtos.stream()
+                .map(dto -> new ReservationEventPayload.ProductReservation(
+                        Long.valueOf(dto.getProductId()),
+                        UUID.randomUUID(),
+                        "Product " + dto.getProductId(),
+                        "Product description for " + dto.getProductId(),
+                        BigDecimal.valueOf(99.99),
+                        dto.getQuantity(),
+                        BigDecimal.valueOf(99.99).multiply(BigDecimal.valueOf(dto.getQuantity())),
+                        true
+                ))
+                .collect(Collectors.toList());
+
+        return ReservationEventPayload.success(reservationId, clientId, products);
     }
 }
