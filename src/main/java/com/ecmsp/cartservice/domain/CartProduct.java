@@ -9,9 +9,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
 
 @Entity
 @Table(name = "cart_product")
@@ -24,6 +23,7 @@ public class CartProduct {
     @Id
     @ManyToOne
     @JoinColumn(name = "cart_id")
+    @EqualsAndHashCode.Exclude
     private Cart cart;
     
     @Id

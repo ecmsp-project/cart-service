@@ -29,8 +29,8 @@ public class KafkaOutbox {
     @Column(name = "id")
     private UUID id;
 
-    @Column(name = "payload", columnDefinition = "jsonb")
-    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "payload", columnDefinition = "TEXT")
+    @JdbcTypeCode(SqlTypes.LONGVARCHAR)
     private String payload;
 
     @Column(name = "created_at", nullable = false)
