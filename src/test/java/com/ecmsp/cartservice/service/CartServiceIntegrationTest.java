@@ -5,6 +5,7 @@ import com.ecmsp.cartservice.domain.Cart;
 import com.ecmsp.cartservice.domain.CartProduct;
 import com.ecmsp.cartservice.domain.wrappers.UserId;
 import com.ecmsp.cartservice.dto.CartDto;
+import com.ecmsp.cartservice.dto.DeleteProductRequestDto;
 import com.ecmsp.cartservice.dto.ProductRequestDto;
 import com.ecmsp.cartservice.repository.CartRepository;
 import com.ecmsp.cartservice.repository.CartProductRepository;
@@ -180,12 +181,11 @@ class CartServiceIntegrationTest {
                 .build();
         cartService.addProductToCart(TEST_USER_ID, addProduct);
 
-        // When - delete all items
-        ProductRequestDto deleteRequest = ProductRequestDto.builder()
+        // When - delete product completely (new endpoint)
+        DeleteProductRequestDto deleteRequest = DeleteProductRequestDto.builder()
                 .productId(101)
-                .quantity(3)
                 .build();
-        CartDto result = cartService.deleteProductFromCart(TEST_USER_ID, deleteRequest);
+        CartDto result = cartService.deleteProductCompletely(TEST_USER_ID, deleteRequest);
 
         // Then
         assertThat(result.getCartProducts()).isEmpty();
@@ -197,6 +197,43 @@ class CartServiceIntegrationTest {
         }
 
         System.out.println("✅ Test passed: Removed product completely when deleting all quantity");
+    }
+
+    @Test
+    void shouldDeleteProductCompletelyFromMultipleProducts() {
+        // Given - add multiple products
+        ProductRequestDto product1 = ProductRequestDto.builder()
+                .productId(101)
+                .quantity(2)
+                .build();
+        ProductRequestDto product2 = ProductRequestDto.builder()
+                .productId(102)
+                .quantity(5)
+                .build();
+        cartService.addProductToCart(TEST_USER_ID, product1);
+        cartService.addProductToCart(TEST_USER_ID, product2);
+
+        // When - delete one product completely
+        DeleteProductRequestDto deleteRequest = DeleteProductRequestDto.builder()
+                .productId(102)
+                .build();
+        CartDto result = cartService.deleteProductCompletely(TEST_USER_ID, deleteRequest);
+
+        // Then - only product 101 should remain
+        assertThat(result.getCartProducts()).hasSize(1);
+        assertThat(result.getCartProducts().iterator().next().getProductId()).isEqualTo(101);
+        assertThat(result.getCartProducts().iterator().next().getQuantity()).isEqualTo(2);
+
+        // Verify in database
+        List<Cart> cartsInDb = cartRepository.findByUserId(TEST_USER_ID.getUserId());
+        assertThat(cartsInDb).hasSize(1);
+        Cart cartInDb = cartsInDb.get(0);
+        assertThat(cartInDb.getCartProducts()).hasSize(1);
+        CartProduct productInDb = cartInDb.getCartProducts().iterator().next();
+        assertThat(productInDb.getProductId()).isEqualTo(101);
+        assertThat(productInDb.getQuantity()).isEqualTo(2);
+
+        System.out.println("✅ Test passed: Deleted product completely from multiple products");
     }
 
     @Test

@@ -2,6 +2,7 @@ package com.ecmsp.cartservice.controller;
 
 import com.ecmsp.cartservice.domain.wrappers.UserId;
 import com.ecmsp.cartservice.dto.CartDto;
+import com.ecmsp.cartservice.dto.DeleteProductRequestDto;
 import com.ecmsp.cartservice.dto.ProductRequestDto;
 import com.ecmsp.cartservice.dto.reservation.ReservationResponse;
 import com.ecmsp.cartservice.jwt.JwtService;
@@ -52,9 +53,9 @@ public class CartController {
     }
 
     @PostMapping("/delete/product")
-    public CartDto deleteProductFromDto(@RequestBody ProductRequestDto productRequest, HttpServletRequest request) {
+    public CartDto deleteProductFromDto(@RequestBody DeleteProductRequestDto deleteRequest, HttpServletRequest request) {
         UserId userId = jwtService.extractUserIdFromRequest(request);
-        return cartService.deleteProductFromCart(userId, productRequest);
+        return cartService.deleteProductCompletely(userId, deleteRequest);
     }
 
 

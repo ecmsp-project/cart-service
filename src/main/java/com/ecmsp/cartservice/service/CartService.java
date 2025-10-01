@@ -5,6 +5,7 @@ import com.ecmsp.cartservice.domain.CartProduct;
 import com.ecmsp.cartservice.domain.wrappers.UserId;
 import com.ecmsp.cartservice.dto.CartDto;
 import com.ecmsp.cartservice.dto.CartProductDto;
+import com.ecmsp.cartservice.dto.DeleteProductRequestDto;
 import com.ecmsp.cartservice.dto.ProductRequestDto;
 import com.ecmsp.cartservice.kafka.OrderKafkaProducer;
 import com.ecmsp.cartservice.repository.CartRepository;
@@ -146,22 +147,71 @@ public class CartService {
 
     @Transactional
     public CartDto updateQuantitiesOfExistedProducts(UserId userId, CartDto cartWithNewQuantities) {
-        CartDto cart = getCartOrCreateNew(userId);
-        Set<CartProductDto> cartProducts = cart.getCartProducts();
+        // Get the actual cart entity from database
+        List<Cart> carts = cartRepository.findByUserId(userId.getUserId());
+        final Cart cart;
+        if (carts.isEmpty()) {
+            // Create new cart if none exists
+            Cart newCart = new Cart();
+            newCart.setUserId(userId.getUserId());
+            newCart.setCreatedAt(java.time.LocalDateTime.now());
+            cart = cartRepository.save(newCart);
+        } else {
+            cart = carts.get(0);
+        }
 
-        cartWithNewQuantities.getCartProducts().forEach(updatedProduct -> {
-            Optional<CartProductDto> productToDelete = cartProducts.stream().filter(p -> p.getProductId().equals(updatedProduct.getProductId())).findFirst();
-            if(productToDelete.isPresent()){
-                CartProductDto product = productToDelete.get();
-                cartProducts.remove(product);
-                product.setQuantity(updatedProduct.getQuantity());
-                cartProducts.add(product);
+        // Update quantities for each product in the request
+        for (CartProductDto updatedProduct : cartWithNewQuantities.getCartProducts()) {
+            // Find existing product in cart
+            Optional<CartProduct> existingProduct = cart.getCartProducts().stream()
+                .filter(cp -> cp.getProductId().equals(updatedProduct.getProductId()))
+                .findFirst();
+
+            if (existingProduct.isPresent()) {
+                // Update existing product quantity
+                existingProduct.get().setQuantity(updatedProduct.getQuantity());
+            } else {
+                // Add new product to cart
+                CartProduct newProduct = new CartProduct();
+                newProduct.setCart(cart);
+                newProduct.setProductId(updatedProduct.getProductId());
+                newProduct.setQuantity(updatedProduct.getQuantity());
+                cart.getCartProducts().add(newProduct);
             }
-        });
+        }
 
-        return convertToDTO(cartRepository.save(convertToEntity(cart)));
+        Cart savedCart = cartRepository.save(cart);
+        return convertToDTO(savedCart);
     }
 
+    @Transactional
+    public CartDto deleteProductCompletely(UserId userId, DeleteProductRequestDto deleteRequest) {
+        // Get cart entity
+        List<Cart> carts = cartRepository.findByUserId(userId.getUserId());
+        if (carts.isEmpty()) {
+            return getCartOrCreateNew(userId);
+        }
+
+        Cart cart = carts.get(0);
+        if (cart.getCartProducts().isEmpty()) {
+            return convertToDTO(cart);
+        }
+
+        // Find product to delete completely
+        Optional<CartProduct> productToRemove = cart.getCartProducts().stream()
+                .filter(cp -> cp.getProductId().equals(deleteRequest.getProductId()))
+                .findFirst();
+
+        if (productToRemove.isPresent()) {
+            // Always remove product completely
+            cart.getCartProducts().remove(productToRemove.get());
+        }
+
+        Cart savedCart = cartRepository.save(cart);
+        return convertToDTO(savedCart);
+    }
+
+    @Transactional
     public void deleteCart(UserId id) {
         cartRepository.deleteCartByUserId(id.getUserId());
     }
