@@ -27,15 +27,15 @@ import static org.apache.logging.log4j.ThreadContext.isEmpty;
 public class ReservationService {
     private final CartService cartService;
     private final OrderKafkaProducer orderKafkaProducer;
-//    private final RequestReservationOfProduct requestReservationOfProduct;
+    private final RequestReservationOfProduct requestReservationOfProduct;
     private final KafkaOutboxService kafkaOutboxService;
 
     public ReservationService(CartService cartService, OrderKafkaProducer orderKafkaProducer,
-//                            RequestReservationOfProduct requestReservationOfProduct,
+                            RequestReservationOfProduct requestReservationOfProduct,
                             KafkaOutboxService kafkaOutboxService) {
         this.cartService = cartService;
         this.orderKafkaProducer = orderKafkaProducer;
-//        this.requestReservationOfProduct = requestReservationOfProduct;
+        this.requestReservationOfProduct = requestReservationOfProduct;
         this.kafkaOutboxService = kafkaOutboxService;
     }
 
@@ -48,26 +48,26 @@ public class ReservationService {
         }
         ReservationProductMessage reservationProductMessage = buildReservationProductMessage(productDtos);
 
-//        ReservationMessageResponse reservationMessageResponse = requestReservationOfProduct.reserveProducts(reservationProductMessage);
-//        if(reservationMessageResponse.success()){
-//            UUID reservationId = UUID.randomUUID();
-//            UUID clientId = UUID.randomUUID();
-//
-//            CartCreatedEvent cartCreatedEvent = buildCartCreatedEvent(userId, productDtos);
-//            OrderCreateMessage orderCreateMessage = new OrderCreateMessage(cartCreatedEvent);
-//            orderKafkaProducer.sendToCreateRawOrder(orderCreateMessage);
-//
-//            // Delete cart after successful reservation and order creation
-//            cartService.deleteCart(userId);
-//            ReservationEventPayload eventPayload = buildReservationEventPayload(reservationId, clientId, productDtos);
-//            kafkaOutboxService.saveEvent(eventPayload, "RESERVATION_SUCCESS", "reservation-events");
-//
-//            return new ReservationSuccessResponse(
-//                "Products successfully reserved. Order has been created and cart cleared.",
-//                reservationMessageResponse.variants()
-//            );
-//
-//        }
+        ReservationMessageResponse reservationMessageResponse = requestReservationOfProduct.reserveProducts(reservationProductMessage);
+        if(reservationMessageResponse.success()){
+            UUID reservationId = UUID.randomUUID();
+            UUID clientId = UUID.randomUUID();
+
+            CartCreatedEvent cartCreatedEvent = buildCartCreatedEvent(userId, productDtos);
+            OrderCreateMessage orderCreateMessage = new OrderCreateMessage(cartCreatedEvent);
+            orderKafkaProducer.sendToCreateRawOrder(orderCreateMessage);
+
+            // Delete cart after successful reservation and order creation
+            cartService.deleteCart(userId);
+            ReservationEventPayload eventPayload = buildReservationEventPayload(reservationId, clientId, productDtos);
+            kafkaOutboxService.saveEvent(eventPayload, "RESERVATION_SUCCESS", "reservation-events");
+
+            return new ReservationSuccessResponse(
+                "Products successfully reserved. Order has been created and cart cleared.",
+                reservationMessageResponse.variants()
+            );
+
+        }
 
         return new ReservationFailedResponse("Failed to reserve products. Please check product availability and try again.");
     }

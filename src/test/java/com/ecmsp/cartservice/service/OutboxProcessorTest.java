@@ -4,7 +4,6 @@ import com.ecmsp.cartservice.domain.KafkaOutbox;
 import com.ecmsp.cartservice.dto.event.ReservationEventPayload;
 import com.ecmsp.cartservice.repository.KafkaOutboxRepository;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,7 +16,6 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@Disabled
 @ActiveProfiles("test")
 class OutboxProcessorTest {
 

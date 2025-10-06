@@ -23,3 +23,13 @@ INSERT INTO cart_product (cart_id, product_id, quantity) VALUES
                                                              (2, 1003, 5),
                                                              (3, 1001, 1),
                                                              (3, 1004, 3);
+
+CREATE TABLE kafka_outbox (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    event_type VARCHAR(255) NOT NULL,
+    topic VARCHAR(255) NOT NULL,
+    payload TEXT NOT NULL,
+    processed BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    processed_at TIMESTAMP
+);
