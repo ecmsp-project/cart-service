@@ -1,0 +1,300 @@
+{
+	"info": {
+		"_postman_id": "cart-service-tests",
+		"name": "Cart Service API Tests",
+		"description": "Collection for testing Cart Service REST API endpoints against real database",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Get Cart (or Create New)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8085/api/carts",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"api",
+						"carts"
+					]
+				},
+				"description": "Gets the cart for the user (extracted from JWT token). If no cart exists, creates a new empty cart."
+			},
+			"response": []
+		},
+		{
+			"name": "2. Add Product to Cart",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"productId\": 101,\n    \"quantity\": 2\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8085/api/carts",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"api",
+						"carts"
+					]
+				},
+				"description": "Adds a product to the cart. If product already exists, increases the quantity."
+			},
+			"response": []
+		},
+		{
+			"name": "3. Add Another Product",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"productId\": 102,\n    \"quantity\": 1\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8085/api/carts",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"api",
+						"carts"
+					]
+				},
+				"description": "Adds a different product to test multiple products in cart."
+			},
+			"response": []
+		},
+		{
+			"name": "4. Increase Quantity (Add Same Product)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"productId\": 101,\n    \"quantity\": 3\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8085/api/carts",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"api",
+						"carts"
+					]
+				},
+				"description": "Adds more quantity to existing product (productId: 101). Total should become 5 (2+3)."
+			},
+			"response": []
+		},
+		{
+			"name": "5. Delete Product Completely",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"productId\": 102\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8085/api/carts/delete/product",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"api",
+						"carts",
+						"delete",
+						"product"
+					]
+				},
+				"description": "Removes product 102 completely. Now only requires productId - no quantity needed!"
+			},
+			"response": []
+		},
+		{
+			"name": "6. Update Quantities (Bulk Update)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"cartProducts\": [\n        {\n            \"productId\": 101,\n            \"quantity\": 1\n        },\n        {\n            \"productId\": 103,\n            \"quantity\": 4\n        }\n    ]\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8085/api/carts/update/quantities",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"api",
+						"carts",
+						"update",
+						"quantities"
+					]
+				},
+				"description": "Updates quantities of existing products in bulk. Changes product 101 quantity to 1 and adds product 103 with quantity 4."
+			},
+			"response": []
+		},
+		{
+			"name": "7. Create Order (Reserve Products)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8085/api/carts/create/order",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"api",
+						"carts",
+						"create",
+						"order"
+					]
+				},
+				"description": "Creates an order reservation for all products in the cart using gRPC service."
+			},
+			"response": []
+		},
+		{
+			"name": "8. Delete Entire Cart",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8085/api/carts",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"api",
+						"carts"
+					]
+				},
+				"description": "Deletes the entire cart and all its products for the current user."
+			},
+			"response": []
+		},
+		{
+			"name": "9. Verify Cart Deleted",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8085/api/carts",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"api",
+						"carts"
+					]
+				},
+				"description": "Verifies that cart was deleted and a new empty cart is created."
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8085"
+		}
+	]
+}
