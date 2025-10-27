@@ -7,15 +7,16 @@ import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.io.Serializable;
 
 @Entity
 @Table(name = "cart_product")
 @Data
 @NoArgsConstructor
+@ToString(exclude = "cart")
+@EqualsAndHashCode(exclude = "cart")
 @AllArgsConstructor
 @IdClass(CartProductId.class)
 public class CartProduct {
@@ -23,7 +24,6 @@ public class CartProduct {
     @Id
     @ManyToOne
     @JoinColumn(name = "cart_id")
-    @EqualsAndHashCode.Exclude
     private Cart cart;
     
     @Id

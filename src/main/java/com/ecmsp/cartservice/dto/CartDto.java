@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -15,7 +16,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class CartDto {
     private Long cartId;
-    private Long userId;
+    private UUID userId;
     private LocalDateTime createdAt;
     
     @Builder.Default
