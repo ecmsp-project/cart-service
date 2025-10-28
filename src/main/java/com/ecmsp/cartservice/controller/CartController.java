@@ -45,6 +45,6 @@ public class CartController {
 
     @PostMapping("/update/quantities")
     public CartDto updateQuantitiesOfExistingProducts(@RequestBody CartDto cartDto){
-        return cartService.updateQuantitiesOfExistedProducts(new UserId(UUID.randomUUID()), cartDto);
+        return cartService.updateCart(new UserId(UUID.randomUUID()), cartDto);
     }
 }

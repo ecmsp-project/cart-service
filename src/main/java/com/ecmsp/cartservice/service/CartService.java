@@ -5,7 +5,6 @@ import com.ecmsp.cartservice.domain.CartProduct;
 import com.ecmsp.cartservice.domain.wrappers.UserId;
 import com.ecmsp.cartservice.dto.CartDto;
 import com.ecmsp.cartservice.dto.CartProductDto;
-import com.ecmsp.cartservice.kafka.OrderKafkaProducer;
 import com.ecmsp.cartservice.repository.CartRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +35,7 @@ public class CartService {
     @Transactional
     public CartDto addProductToCart(UserId userId, CartProductDto productToAdd) {
         Cart cart = getCartOrCreateNew(userId);
-        cart.addOrUpdateProduct(convertCartProductToEntity(productToAdd));
+        cart.addProduct(convertCartProductToEntity(productToAdd));
         return convertCartToDTO(cartRepository.save(cart));
     }
 
@@ -49,20 +48,10 @@ public class CartService {
 
 
     @Transactional
-    public CartDto updateQuantitiesOfExistedProducts(UserId userId, CartDto cartWithNewQuantities) {
+    public CartDto updateCart(UserId userId, CartDto cartWithNewQuantities) {
         Cart cart = getCartOrCreateNew(userId);
-        Set<CartProduct> cartProducts = cart.getCartProducts();
-
-        cartWithNewQuantities.getCartProducts().forEach(updatedProduct -> {
-            Optional<CartProduct> productToDelete = cartProducts.stream().filter(p -> p.getProductId().equals(updatedProduct.getProductId())).findFirst();
-            if(productToDelete.isPresent()){
-                CartProduct product = productToDelete.get();
-                cartProducts.remove(product);
-                product.setQuantity(updatedProduct.getQuantity());
-                cartProducts.add(product);
-            }
-        });
-
+        Set<CartProduct> cartProducts = cartWithNewQuantities.getCartProducts().stream().map(this::convertCartProductToEntity).collect(Collectors.toSet());
+        cart.replaceProducts(cartProducts);
         return convertCartToDTO(cartRepository.save(cart));
     }
 

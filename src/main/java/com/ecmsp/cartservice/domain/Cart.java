@@ -1,11 +1,9 @@
 package com.ecmsp.cartservice.domain;
 
-import com.google.type.DateTime;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -40,7 +38,7 @@ public class Cart {
         this.createdAt = LocalDateTime.now();
     }
 
-    public void addOrUpdateProduct(CartProduct product) {
+    public void addProduct(CartProduct product) {
         Optional<CartProduct> existing = cartProducts.stream()
                 .filter(p -> p.getProductId().equals(product.getProductId()))
                 .findFirst();
@@ -54,6 +52,16 @@ public class Cart {
             product.setCart(this);
         }
     }
+
+    public void replaceProducts(Set<CartProduct> products) {
+        this.cartProducts.clear();
+
+        products.forEach(cartProduct -> {
+            cartProduct.setCart(this);
+            this.cartProducts.add(cartProduct);
+        });
+    }
+
 
     public void removeProduct(Integer productId) {
         cartProducts.removeIf(product ->
