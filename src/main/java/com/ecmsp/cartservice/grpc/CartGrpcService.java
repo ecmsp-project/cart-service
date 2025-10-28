@@ -101,7 +101,7 @@ public class CartGrpcService extends CartServiceGrpc.CartServiceImplBase {
 
             CartDto cartDto = cartGrpcMapper.toCartDto(request);
 
-            CartDto updatedCart = cartService.updateQuantitiesOfExistedProducts(userId, cartDto);
+            CartDto updatedCart = cartService.updateCart(userId, cartDto);
             UpdateQuantitiesResponse response = cartGrpcMapper.toUpdateQuantitiesResponse(updatedCart);
 
             responseObserver.onNext(response);
