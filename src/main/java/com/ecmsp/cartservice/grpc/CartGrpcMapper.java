@@ -50,13 +50,24 @@ public class CartGrpcMapper {
                 .build();
     }
 
-    public UpdateQuantitiesResponse toUpdateQuantitiesResponse(CartDto cartDto) {
+    public UpdateQuantityResponse toUpdateQuantityResponse(CartDto cartDto) {
         List<CartProduct> cartProducts = cartDto.getCartProducts().stream()
                 .map(this::toCartProduct)
                 .toList();
 
-        return UpdateQuantitiesResponse.newBuilder()
+        return UpdateQuantityResponse.newBuilder()
                 .setCart(
+                        Cart.newBuilder().setCartId(cartDto.getCartId().intValue()).addAllCartProducts(cartProducts))
+                .build();
+    }
+
+    public SubtractProductResponse toSubtractProductResponse(CartDto cartDto){
+        List<CartProduct> cartProducts = cartDto.getCartProducts().stream()
+                .map(this::toCartProduct)
+                .toList();
+
+        return SubtractProductResponse.newBuilder()
+                .setCat(
                         Cart.newBuilder().setCartId(cartDto.getCartId().intValue()).addAllCartProducts(cartProducts))
                 .build();
     }
@@ -79,11 +90,17 @@ public class CartGrpcMapper {
                 .build();
     }
 
-    public CartDto toCartDto(UpdateQuantitiesRequest request) {
-        return CartDto.builder()
-                .cartProducts(request.getCart().getCartProductsList().stream()
-                        .map(this::toCartProductDto)
-                        .collect(java.util.stream.Collectors.toSet()))
+    public CartProductDto toCartProductDto(SubtractProductRequest request) {
+        return CartProductDto.builder()
+                .productId(request.getProduct().getProductId())
+                .quantity(request.getProduct().getQuantity())
+                .build();
+    }
+
+    public CartProductDto toCartProductDto(UpdateQuantityRequest request) {
+        return CartProductDto.builder()
+                .productId(request.getProduct().getProductId())
+                .quantity(request.getProduct().getQuantity())
                 .build();
     }
 

@@ -93,39 +93,41 @@ public class CartGrpcService extends CartServiceGrpc.CartServiceImplBase {
         }
     }
 
+
     @Override
-    public void updateQuantities(UpdateQuantitiesRequest request, StreamObserver<UpdateQuantitiesResponse> responseObserver) {
+    public void subtractProduct(SubtractProductRequest request, StreamObserver<SubtractProductResponse> responseObserver) {
         try {
+        UserContextData userContextData = UserContextGrpcHolder.getUserContext();
+        UserId userId = UserId.fromString(userContextData.userId());
+
+        CartProductDto cartProductDto = cartGrpcMapper.toCartProductDto(request);
+        CartDto updatedCart = cartService.subtractProductQuantity(userId, cartProductDto);
+        SubtractProductResponse response = cartGrpcMapper.toSubtractProductResponse(updatedCart);
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+        }catch (Exception e){
+            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+        }
+
+    }
+
+    @Override
+    public void updateQuantity(UpdateQuantityRequest request, StreamObserver<UpdateQuantityResponse> responseObserver) {
+        try{
             UserContextData userContextData = UserContextGrpcHolder.getUserContext();
             UserId userId = UserId.fromString(userContextData.userId());
 
-            CartDto cartDto = cartGrpcMapper.toCartDto(request);
+            CartProductDto cartProductDto = cartGrpcMapper.toCartProductDto(request);
 
-            CartDto updatedCart = cartService.updateCart(userId, cartDto);
-            UpdateQuantitiesResponse response = cartGrpcMapper.toUpdateQuantitiesResponse(updatedCart);
+            CartDto updatedCart = cartService.updateQuantityOfProduct(userId, cartProductDto);
+            UpdateQuantityResponse response = cartGrpcMapper.toUpdateQuantityResponse(updatedCart);
 
             responseObserver.onNext(response);
             responseObserver.onCompleted();
-        } catch (Exception e) {
+        }catch (Exception e){
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
         }
     }
 
-    /**
-     * @deprecated This method is deprecated and will be removed in a future version.
-     * Order creation should be done by OrderService.
-     */
-    @Deprecated
-    @Override
-    public void createOrder(CreateOrderRequest request, StreamObserver<CreateOrderResponse> responseObserver) {
-        try {
-            // TODO: Implement order creation logic via Kafka or REST
-            // For now, return a placeholder response
-            CreateOrderResponse response = cartGrpcMapper.toCreateOrderResponse("placeholder-order-id");
-            responseObserver.onNext(response);
-            responseObserver.onCompleted();
-        } catch (Exception e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
-        }
-    }
 }
