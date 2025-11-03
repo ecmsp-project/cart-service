@@ -8,6 +8,7 @@ import com.ecmsp.cartservice.dto.CartProductDto;
 import com.ecmsp.cartservice.repository.CartRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,12 +47,27 @@ public class CartService {
         return convertCartToDTO(cartRepository.save(cart));
     }
 
+    @Transactional
+    public CartDto subtractProductQuantity(UserId userId, CartProductDto cartProductDto){
+        Cart cart = getCartOrCreateNew(userId);
+        cart.subtractProduct(convertCartProductToEntity(cartProductDto));
+        return convertCartToDTO(cartRepository.save(cart));
+    }
+
 
     @Transactional
     public CartDto updateCart(UserId userId, CartDto cartWithNewQuantities) {
         Cart cart = getCartOrCreateNew(userId);
         Set<CartProduct> cartProducts = cartWithNewQuantities.getCartProducts().stream().map(this::convertCartProductToEntity).collect(Collectors.toSet());
         cart.replaceProducts(cartProducts);
+        return convertCartToDTO(cartRepository.save(cart));
+    }
+
+    @Transactional
+    public CartDto updateQuantityOfProduct(UserId userId, CartProductDto cartProductDto) {
+        Cart cart = getCartOrCreateNew(userId);
+        cart.replaceSingleProduct(convertCartProductToEntity(cartProductDto));
+
         return convertCartToDTO(cartRepository.save(cart));
     }
 

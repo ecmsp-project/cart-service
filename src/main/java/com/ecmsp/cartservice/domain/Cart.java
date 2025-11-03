@@ -1,15 +1,13 @@
 package com.ecmsp.cartservice.domain;
 
+import com.ecmsp.cartservice.dto.CartProductDto;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table(name = "cart")
@@ -62,10 +60,31 @@ public class Cart {
         });
     }
 
+    public void replaceSingleProduct(CartProduct product) {
+        Optional<CartProduct> cartProductToModify = this.cartProducts.stream().filter(productFromCart -> Objects.equals(product.getProductId(), productFromCart.getProductId())).findFirst();
+        if(cartProductToModify.isPresent()){
+            cartProductToModify.get().setQuantity(product.getQuantity());
+        }
+
+    }
+
 
     public void removeProduct(Integer productId) {
         cartProducts.removeIf(product ->
                 product.getProductId().equals(productId)
         );
+    }
+
+    public void subtractProduct(CartProduct product){
+        Optional<CartProduct> cartProductToModify = this.cartProducts.stream().filter(productFromCart -> Objects.equals(product.getProductId(), productFromCart.getProductId())).findFirst();
+        if(cartProductToModify.isPresent()){
+            CartProduct toModify = cartProductToModify.get();
+            int quantityToSet = toModify.getQuantity()-product.getQuantity();
+            if(quantityToSet>0){
+                toModify.setQuantity(quantityToSet);
+            }else{
+                removeProduct(toModify.getProductId());
+            }
+        }
     }
 }
