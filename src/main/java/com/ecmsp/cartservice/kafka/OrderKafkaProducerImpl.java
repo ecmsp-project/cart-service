@@ -3,6 +3,7 @@ package com.ecmsp.cartservice.kafka;
 import com.ecmsp.cartservice.dto.OrderCreateMessage;
 import org.springframework.stereotype.Component;
 
+@Deprecated
 @Component
 public class OrderKafkaProducerImpl implements OrderKafkaProducer{
     @Override
