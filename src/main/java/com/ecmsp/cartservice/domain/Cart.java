@@ -1,6 +1,5 @@
 package com.ecmsp.cartservice.domain;
 
-import com.ecmsp.cartservice.dto.CartProductDto;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
