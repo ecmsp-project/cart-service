@@ -6,9 +6,9 @@ import com.ecmsp.cartservice.domain.wrappers.UserId;
 import com.ecmsp.cartservice.dto.CartDto;
 import com.ecmsp.cartservice.dto.CartProductDto;
 import com.ecmsp.cartservice.repository.CartRepository;
+import com.ecmsp.cartservice.util.ProductIdMapper;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -111,14 +111,14 @@ public class CartService {
     public CartProductDto convertCartToDTO(CartProduct cartProduct) {
         return CartProductDto.builder()
                 .cartId(cartProduct.getCart().getCartId())
-                .productId(cartProduct.getProductId())
+                .productId(ProductIdMapper.uuidToInt(cartProduct.getProductId()))
                 .quantity(cartProduct.getQuantity())
                 .build();
     }
 
     public CartProduct convertCartProductToEntity(CartProductDto cartProductDto) {
         CartProduct cartProduct = new CartProduct();
-        cartProduct.setProductId(cartProductDto.getProductId());
+        cartProduct.setProductId(ProductIdMapper.intToUuid(cartProductDto.getProductId()));
         cartProduct.setQuantity(cartProductDto.getQuantity());
 
         return cartProduct;

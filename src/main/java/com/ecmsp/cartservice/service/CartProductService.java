@@ -6,6 +6,7 @@ import com.ecmsp.cartservice.domain.CartProductId;
 import com.ecmsp.cartservice.dto.CartProductDto;
 import com.ecmsp.cartservice.repository.CartProductRepository;
 import com.ecmsp.cartservice.repository.CartRepository;
+import com.ecmsp.cartservice.util.ProductIdMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +39,7 @@ public class CartProductService {
     }
 
     public List<CartProductDto> getCartProductsByProductId(Integer productId) {
-        return cartProductRepository.findByProductId(productId).stream()
+        return cartProductRepository.findByProductId(ProductIdMapper.intToUuid(productId)).stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
@@ -60,7 +61,7 @@ public class CartProductService {
 
         if (cartOptional.isPresent()) {
             Cart cart = cartOptional.get();
-            CartProductId id = new CartProductId(cart, productId);
+            CartProductId id = new CartProductId(cart, ProductIdMapper.intToUuid(productId));
 
             return cartProductRepository.findById(id)
                     .map(existingCartProduct -> {
@@ -78,7 +79,7 @@ public class CartProductService {
 
         if (cartOptional.isPresent()) {
             Cart cart = cartOptional.get();
-            CartProductId id = new CartProductId(cart, productId);
+            CartProductId id = new CartProductId(cart, ProductIdMapper.intToUuid(productId));
             cartProductRepository.deleteById(id);
             return true;
         }
@@ -90,7 +91,7 @@ public class CartProductService {
     public CartProductDto convertToDto(CartProduct cartProduct) {
         return CartProductDto.builder()
                 .cartId(cartProduct.getCart().getCartId())
-                .productId(cartProduct.getProductId())
+                .productId(ProductIdMapper.uuidToInt(cartProduct.getProductId()))
                 .quantity(cartProduct.getQuantity())
                 .build();
     }
@@ -99,7 +100,7 @@ public class CartProductService {
     public CartProduct convertToEntity(CartProductDto cartProductDto, Cart cart) {
         CartProduct cartProduct = new CartProduct();
         cartProduct.setCart(cart);
-        cartProduct.setProductId(cartProductDto.getProductId());
+        cartProduct.setProductId(ProductIdMapper.intToUuid(cartProductDto.getProductId()));
         cartProduct.setQuantity(cartProductDto.getQuantity());
         return cartProduct;
     }

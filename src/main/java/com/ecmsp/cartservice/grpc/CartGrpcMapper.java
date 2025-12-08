@@ -3,9 +3,11 @@ package com.ecmsp.cartservice.grpc;
 import com.ecmsp.cart.v1.*;
 import com.ecmsp.cartservice.dto.CartDto;
 import com.ecmsp.cartservice.dto.CartProductDto;
+import com.ecmsp.cartservice.util.ProductIdMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.UUID;
 
 @Component
 public class CartGrpcMapper {
@@ -86,7 +88,7 @@ public class CartGrpcMapper {
 
     public CartProductDto toCartProductDto(DeleteProductRequest request) {
         return CartProductDto.builder()
-                .productId(request.getProductId())
+                .productId(ProductIdMapper.uuidToInt(UUID.fromString(request.getProductId())))
                 .build();
     }
 
@@ -106,14 +108,14 @@ public class CartGrpcMapper {
 
     private CartProduct toCartProduct(CartProductDto productDto) {
         return CartProduct.newBuilder()
-                .setProductId(productDto.getProductId())
+                .setProductId(ProductIdMapper.intToUuid(productDto.getProductId()).toString())
                 .setQuantity(productDto.getQuantity())
                 .build();
     }
 
     private CartProductDto toCartProductDto(CartProduct cartProduct) {
         return CartProductDto.builder()
-                .productId(cartProduct.getProductId())
+                .productId(ProductIdMapper.uuidToInt(UUID.fromString(cartProduct.getProductId())))
                 .quantity(cartProduct.getQuantity())
                 .build();
     }

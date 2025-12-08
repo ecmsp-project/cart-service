@@ -9,7 +9,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.*;
 
-import java.io.Serializable;
+import java.util.UUID;
 
 @Entity
 @Table(name = "cart_product")
@@ -27,8 +27,8 @@ public class CartProduct {
     private Cart cart;
     
     @Id
-    @Column(name = "product_id")
-    private Integer productId;
+    @Column(name = "product_id", columnDefinition = "uuid")
+    private UUID productId;
     
     @Column(name = "quantity")
     private Integer quantity;

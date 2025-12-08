@@ -8,6 +8,8 @@ import lombok.ToString;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import com.ecmsp.cartservice.util.ProductIdMapper;
+
 @Entity
 @Table(name = "cart")
 @Data
@@ -69,6 +71,10 @@ public class Cart {
 
 
     public void removeProduct(Integer productId) {
+        removeProduct(ProductIdMapper.intToUuid(productId));
+    }
+
+    public void removeProduct(java.util.UUID productId) {
         cartProducts.removeIf(product ->
                 product.getProductId().equals(productId)
         );

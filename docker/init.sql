@@ -8,7 +8,7 @@ CREATE TABLE cart (
 
 CREATE TABLE cart_product (
                               cart_id INT,
-                              product_id INT,
+                              product_id UUID,
                               quantity INT DEFAULT 1,
                               PRIMARY KEY (cart_id, product_id),
                               FOREIGN KEY (cart_id) REFERENCES cart(cart_id) ON DELETE CASCADE
