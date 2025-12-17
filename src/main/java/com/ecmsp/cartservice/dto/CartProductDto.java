@@ -5,12 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class CartProductDto {
     private Long cartId;
-    private Integer productId;
+    private UUID productId;
     private Integer quantity;
 }

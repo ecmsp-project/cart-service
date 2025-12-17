@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,7 +38,7 @@ public class CartProductService {
         return List.of();
     }
 
-    public List<CartProductDto> getCartProductsByProductId(Integer productId) {
+    public List<CartProductDto> getCartProductsByProductId(UUID productId) {
         return cartProductRepository.findByProductId(productId).stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
@@ -55,7 +56,7 @@ public class CartProductService {
         return Optional.empty();
     }
 
-    public Optional<CartProductDto> updateCartProduct(Integer cartId, Integer productId, CartProductDto cartProductDTO) {
+    public Optional<CartProductDto> updateCartProduct(Integer cartId, UUID productId, CartProductDto cartProductDTO) {
         Optional<Cart> cartOptional = cartRepository.findById(Long.valueOf(cartId));
 
         if (cartOptional.isPresent()) {
@@ -73,7 +74,7 @@ public class CartProductService {
         return Optional.empty();
     }
 
-    public boolean deleteCartProduct(Integer cartId, Integer productId) {
+    public boolean deleteCartProduct(Integer cartId, UUID productId) {
         Optional<Cart> cartOptional = cartRepository.findById(Long.valueOf(cartId));
 
         if (cartOptional.isPresent()) {

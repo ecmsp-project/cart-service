@@ -6,6 +6,7 @@ import com.ecmsp.cartservice.dto.CartProductDto;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.UUID;
 
 @Component
 public class CartGrpcMapper {
@@ -79,41 +80,41 @@ public class CartGrpcMapper {
 
     public CartProductDto toCartProductDto(ProductRequest request) {
         return CartProductDto.builder()
-                .productId(request.getProductId())
+                .productId(UUID.fromString(request.getProductId()))
                 .quantity(request.getQuantity())
                 .build();
     }
 
     public CartProductDto toCartProductDto(DeleteProductRequest request) {
         return CartProductDto.builder()
-                .productId(request.getProductId())
+                .productId(UUID.fromString(request.getProductId()))
                 .build();
     }
 
     public CartProductDto toCartProductDto(SubtractProductRequest request) {
         return CartProductDto.builder()
-                .productId(request.getProduct().getProductId())
+                .productId(UUID.fromString(request.getProduct().getProductId()))
                 .quantity(request.getProduct().getQuantity())
                 .build();
     }
 
     public CartProductDto toCartProductDto(UpdateQuantityRequest request) {
         return CartProductDto.builder()
-                .productId(request.getProduct().getProductId())
+                .productId(UUID.fromString(request.getProduct().getProductId()))
                 .quantity(request.getProduct().getQuantity())
                 .build();
     }
 
     private CartProduct toCartProduct(CartProductDto productDto) {
         return CartProduct.newBuilder()
-                .setProductId(productDto.getProductId())
+                .setProductId(productDto.getProductId().toString())
                 .setQuantity(productDto.getQuantity())
                 .build();
     }
 
     private CartProductDto toCartProductDto(CartProduct cartProduct) {
         return CartProductDto.builder()
-                .productId(cartProduct.getProductId())
+                .productId(UUID.fromString(cartProduct.getProductId()))
                 .quantity(cartProduct.getQuantity())
                 .build();
     }

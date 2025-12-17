@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/cart-products")
@@ -28,7 +29,7 @@ public class CartProductController {
     }
 
     @GetMapping("/product/{productId}")
-    public ResponseEntity<List<CartProductDto>> getCartProductsByProductId(@PathVariable Integer productId) {
+    public ResponseEntity<List<CartProductDto>> getCartProductsByProductId(@PathVariable UUID productId) {
         List<CartProductDto> cartProducts = cartProductService.getCartProductsByProductId(productId);
         return ResponseEntity.ok(cartProducts);
     }
@@ -43,7 +44,7 @@ public class CartProductController {
     @PutMapping("/cart/{cartId}/product/{productId}")
     public ResponseEntity<CartProductDto> updateCartProduct(
             @PathVariable Integer cartId,
-            @PathVariable Integer productId,
+            @PathVariable UUID productId,
             @RequestBody CartProductDto cartProductDto) {
         Optional<CartProductDto> updatedProduct = cartProductService.updateCartProduct(cartId, productId, cartProductDto);
         return updatedProduct.map(ResponseEntity::ok)
@@ -53,7 +54,7 @@ public class CartProductController {
     @DeleteMapping("/cart/{cartId}/product/{productId}")
     public ResponseEntity<HttpStatus> deleteCartProduct(
             @PathVariable Integer cartId,
-            @PathVariable Integer productId) {
+            @PathVariable UUID productId) {
         boolean deleted = cartProductService.deleteCartProduct(cartId, productId);
         if (deleted) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
