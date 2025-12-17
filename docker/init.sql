@@ -7,11 +7,16 @@ CREATE TABLE cart (
 );
 
 CREATE TABLE cart_product (
-                              cart_id INT,
-                              product_id INT,
+                              cart_id INT NOT NULL,
+                              product_id UUID NOT NULL,
                               quantity INT DEFAULT 1,
+
                               PRIMARY KEY (cart_id, product_id),
-                              FOREIGN KEY (cart_id) REFERENCES cart(cart_id) ON DELETE CASCADE
+
+                              CONSTRAINT fk_cart
+                                    FOREIGN KEY (cart_id)
+                                    REFERENCES cart(cart_id)
+                                    ON DELETE CASCADE
 );
 
 INSERT INTO cart (cart_id, user_id) VALUES
@@ -20,11 +25,14 @@ INSERT INTO cart (cart_id, user_id) VALUES
                                         (3, '00000000-0000-0000-0000-000000000103');
 
 INSERT INTO cart_product (cart_id, product_id, quantity) VALUES
-                                                             (1, 1001, 2),
-                                                             (1, 1002, 1),
-                                                             (2, 1003, 5),
-                                                             (3, 1001, 1),
-                                                             (3, 1004, 3);
+                                         (1, '11111111-0000-0000-0000-000000001001', 2),
+                                         (1, '11111111-0000-0000-0000-000000001002', 1),
+
+                                         (2, '11111111-0000-0000-0000-000000001003', 5),
+
+                                         (3, '11111111-0000-0000-0000-000000001001', 1),
+                                         (3, '11111111-0000-0000-0000-000000001004', 3);
+
 CREATE TABLE KAFKA_OUTBOX (
                               id UUID PRIMARY KEY,
                               payload JSONB NOT NULL,

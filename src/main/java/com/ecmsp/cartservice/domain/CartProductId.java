@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -13,7 +14,7 @@ import java.util.Objects;
 public class CartProductId implements Serializable {
 
     private Cart cart;
-    private Integer productId;
+    private UUID productId;
 
     @Override
     public boolean equals(Object o) {

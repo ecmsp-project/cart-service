@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 public interface CartProductRepository extends JpaRepository<CartProduct, CartProductId> {
@@ -23,5 +24,5 @@ public interface CartProductRepository extends JpaRepository<CartProduct, CartPr
      * @param productId the ID of the product
      * @return list of cart products containing the product
      */
-    List<CartProduct> findByProductId(Integer productId);
+    List<CartProduct> findByProductId(UUID productId);
 }

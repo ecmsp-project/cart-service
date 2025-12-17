@@ -68,7 +68,7 @@ public class Cart {
     }
 
 
-    public void removeProduct(Integer productId) {
+    public void removeProduct(UUID productId) {
         cartProducts.removeIf(product ->
                 product.getProductId().equals(productId)
         );
